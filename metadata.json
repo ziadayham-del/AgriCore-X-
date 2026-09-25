@@ -1,0 +1,8 @@
+{
+  "name": "AgriCore-X",
+  "description": "Distributed Smart Agriculture & Farm Management Platform - Real-time IoT farm monitoring, irrigation automation, hybrid energy flow, crop intelligence, and security control.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
