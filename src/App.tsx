@@ -19,10 +19,9 @@ import { Power } from './pages/Power';
 import { Cameras } from './pages/Cameras';
 import { PanTilt } from './pages/PanTilt';
 import { Security } from './pages/Security';
-import { RoofTracker } from './pages/RoofTracker';
+import { Roof } from './pages/Roof';
 import { System } from './pages/System';
 import { Events } from './pages/Events';
-import { Settings } from './pages/Settings';
 
 export default function App() {
   return (
@@ -44,10 +43,10 @@ export default function App() {
             <Route path="/cameras" element={<Cameras />} />
             <Route path="/cameras/security/pan-tilt" element={<PanTilt />} />
             <Route path="/security" element={<Security />} />
-            <Route path="/roof-tracker" element={<RoofTracker />} />
+            <Route path="/roof" element={<Roof />} />
+            <Route path="/roof-tracker" element={<Navigate to="/roof" replace />} />
             <Route path="/system" element={<System />} />
             <Route path="/events" element={<Events />} />
-            <Route path="/settings" element={<Settings />} />
           </Route>
 
           {/* Catch-all redirect to Dashboard */}

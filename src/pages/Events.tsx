@@ -113,7 +113,7 @@ export const Events: React.FC = () => {
             <option value="N01">N01 Server</option>
             <option value="N02">N02 Agriculture</option>
             <option value="N03">N03 Power</option>
-            <option value="N04">N04 Roof/Tracker</option>
+            <option value="N04">N04 Roof & Perimeter</option>
             <option value="N05">N05 TFT HMI</option>
             <option value="N06">N06 Security Cam</option>
             <option value="N07">N07 Crop Cam</option>

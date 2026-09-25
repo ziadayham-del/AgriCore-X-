@@ -9,7 +9,6 @@ import {
   Sun,
   Battery,
   Zap,
-  RotateCw,
   Activity,
   Sliders,
   AlertTriangle,
@@ -18,7 +17,7 @@ import {
 } from 'lucide-react';
 
 export const Power: React.FC = () => {
-  const { power, tracker, settings } = useTelemetry();
+  const { power, settings } = useTelemetry();
   const { showToast } = useToast();
 
   const handlePriorityChange = async (priority: 'solar_first' | 'battery_backup' | 'grid_fallback') => {
@@ -91,9 +90,9 @@ export const Power: React.FC = () => {
                 <span className="text-emerald-800 font-bold">{power.dailySolarKwh} kWh</span>
               </div>
               <div className="flex justify-between items-center pt-1 border-t border-stone-100">
-                <span className="text-stone-400">Tracker Orientation:</span>
+                <span className="text-stone-400">Panel Installation:</span>
                 <span className="text-stone-800 font-bold">
-                  H: {tracker.horizontalAngle}° | V: {tracker.verticalAngle}°
+                  Fixed Structure (30° Tilt, South)
                 </span>
               </div>
             </div>

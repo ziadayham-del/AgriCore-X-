@@ -11,7 +11,6 @@ import {
   PowerTelemetry,
   SecurityTelemetry,
   RoofTelemetry,
-  TrackerTelemetry,
   NetworkTelemetry,
   NodeStatus,
   SystemSettings
@@ -34,7 +33,6 @@ export function useTelemetry() {
     power: hardwareService.power as PowerTelemetry,
     security: hardwareService.security as SecurityTelemetry,
     roof: hardwareService.roof as RoofTelemetry,
-    tracker: hardwareService.tracker as TrackerTelemetry,
     network: hardwareService.network as NetworkTelemetry,
     nodes: hardwareService.nodes as NodeStatus[],
     settings: hardwareService.settings as SystemSettings,

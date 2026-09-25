@@ -10,7 +10,6 @@ import {
   Home as RoofIcon,
   Cpu,
   ScrollText,
-  Settings,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -21,10 +20,9 @@ export const Sidebar: React.FC = () => {
     { to: '/power', label: 'Power & Energy', icon: Zap },
     { to: '/cameras', label: 'Cameras', icon: Camera },
     { to: '/security', label: 'Security', icon: Shield },
-    { to: '/roof-tracker', label: 'Roof & Tracker', icon: RoofIcon },
+    { to: '/roof', label: 'Roof Control', icon: RoofIcon },
     { to: '/system', label: 'System Health', icon: Cpu },
     { to: '/events', label: 'Events & Logs', icon: ScrollText },
-    { to: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (

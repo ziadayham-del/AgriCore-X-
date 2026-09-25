@@ -12,7 +12,6 @@ import {
   PowerTelemetry,
   SecurityTelemetry,
   RoofTelemetry,
-  TrackerTelemetry,
   CameraTelemetry,
   NetworkTelemetry,
   Crop,
@@ -65,8 +64,8 @@ export const INITIAL_NODES: NodeStatus[] = [
   },
   {
     nodeId: 'N04',
-    name: 'Roof, Tracker & Perimeter',
-    role: 'N20 DC Motor, Limit Switches, Dual Servos, 4-Beam Optical Laser',
+    name: 'Roof & Perimeter',
+    role: 'N20 DC Motor Actuator, Limit Switches, 4-Beam Optical Laser',
     controllerMcu: 'ESP32-WROOM-32UE',
     online: true,
     uptimeSeconds: 184310,

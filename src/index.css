@@ -1,13 +1,47 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Times New Roman", Times, serif;
+  --font-serif: "Times New Roman", Times, serif;
+  --font-mono: "Times New Roman", Times, serif;
+}
+
+*,
+*::before,
+*::after {
+  font-family: "Times New Roman", Times, serif !important;
+}
+
 @layer base {
   :root {
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: "Times New Roman", Times, serif;
+    --font-mono: "Times New Roman", Times, serif;
+  }
+
+  html,
+  body,
+  input,
+  button,
+  select,
+  textarea,
+  table,
+  th,
+  td,
+  span,
+  div,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  code,
+  pre {
+    font-family: "Times New Roman", Times, serif !important;
   }
 
   body {
-    font-family: var(--font-sans);
     background-color: #F7FAF7;
     color: #17231c;
   }

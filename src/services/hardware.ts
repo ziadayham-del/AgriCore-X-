@@ -10,7 +10,6 @@ import {
   PowerTelemetry,
   SecurityTelemetry,
   RoofTelemetry,
-  TrackerTelemetry,
   CameraTelemetry,
   NetworkTelemetry,
   Crop,
@@ -106,20 +105,6 @@ class HardwareService {
     rainDetected: false,
     autoCloseOnRain: true,
     motorCurrentMa: 0,
-    lastUpdate: new Date().toISOString(),
-  };
-
-  // Tracker Telemetry
-  public tracker: TrackerTelemetry = {
-    horizontalAngle: 42,
-    verticalAngle: 18,
-    mode: 'AUTO',
-    ldrSensors: {
-      topLeft: 840,
-      topRight: 825,
-      bottomLeft: 810,
-      bottomRight: 830,
-    },
     lastUpdate: new Date().toISOString(),
   };
 
@@ -357,26 +342,39 @@ class HardwareService {
   }
 
   /**
-   * Roof: Open Roof with Limit Switch Check
+   * Roof: Open Roof with Limit Switch & Interlock Checks
    */
   public async openRoof() {
     return commandService.executeCommand({
       targetNode: 'N04',
       action: 'ROOF_OPEN',
       safetyCheck: () => {
-        if (this.roof.limitSwitchOpen) {
+        const node = this.nodes.find(n => n.nodeId === 'N04');
+        if (node && !node.online) {
+          return { allowed: false, reason: 'Roof controller (Node N04) is OFFLINE. Roof control unavailable. Check roof controller status.' };
+        }
+        if (this.roof.state === 'FAULT') {
+          return { allowed: false, reason: 'Roof controller is in FAULT state: ' + (this.roof.faultReason || 'Motor driver stall/overcurrent') + '. Check roof controller status.' };
+        }
+        if (this.roof.state === 'OFFLINE') {
+          return { allowed: false, reason: 'Roof state is OFFLINE. Check roof controller status.' };
+        }
+        if (this.roof.limitSwitchOpen && this.roof.limitSwitchClosed) {
+          return { allowed: false, reason: 'Limit-switch fault: Both OPEN and CLOSED switches reporting active simultaneously. Check roof controller status.' };
+        }
+        if (this.roof.limitSwitchOpen || this.roof.state === 'OPEN') {
           return { allowed: false, reason: 'Roof is already fully OPEN (limit switch engaged).' };
         }
         if (this.roof.rainDetected && this.roof.autoCloseOnRain) {
-          return { allowed: false, reason: 'Rain sensor active: Cannot open roof during rain event.' };
+          return { allowed: false, reason: 'Rain sensor active: Cannot open roof during precipitation event.' };
         }
         return { allowed: true };
       },
       executor: async () => {
-        this.roof = { ...this.roof, state: 'OPENING', motorCurrentMa: 180 };
+        this.roof = { ...this.roof, state: 'OPENING', motorCurrentMa: 180, lastUpdate: new Date().toISOString() };
         this.notify();
         
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1500));
         this.roof = {
           ...this.roof,
           state: 'OPEN',
@@ -398,23 +396,36 @@ class HardwareService {
   }
 
   /**
-   * Roof: Close Roof
+   * Roof: Close Roof with Limit Switch & Interlock Checks
    */
   public async closeRoof() {
     return commandService.executeCommand({
       targetNode: 'N04',
       action: 'ROOF_CLOSE',
       safetyCheck: () => {
-        if (this.roof.limitSwitchClosed) {
+        const node = this.nodes.find(n => n.nodeId === 'N04');
+        if (node && !node.online) {
+          return { allowed: false, reason: 'Roof controller (Node N04) is OFFLINE. Roof control unavailable. Check roof controller status.' };
+        }
+        if (this.roof.state === 'FAULT') {
+          return { allowed: false, reason: 'Roof controller is in FAULT state: ' + (this.roof.faultReason || 'Motor driver stall/overcurrent') + '. Check roof controller status.' };
+        }
+        if (this.roof.state === 'OFFLINE') {
+          return { allowed: false, reason: 'Roof state is OFFLINE. Check roof controller status.' };
+        }
+        if (this.roof.limitSwitchOpen && this.roof.limitSwitchClosed) {
+          return { allowed: false, reason: 'Limit-switch fault: Both OPEN and CLOSED switches reporting active simultaneously. Check roof controller status.' };
+        }
+        if (this.roof.limitSwitchClosed || this.roof.state === 'CLOSED') {
           return { allowed: false, reason: 'Roof is already fully CLOSED (limit switch engaged).' };
         }
         return { allowed: true };
       },
       executor: async () => {
-        this.roof = { ...this.roof, state: 'CLOSING', motorCurrentMa: 185 };
+        this.roof = { ...this.roof, state: 'CLOSING', motorCurrentMa: 185, lastUpdate: new Date().toISOString() };
         this.notify();
         
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1500));
         this.roof = {
           ...this.roof,
           state: 'CLOSED',
@@ -443,57 +454,19 @@ class HardwareService {
       targetNode: 'N04',
       action: 'ROOF_STOP',
       executor: async () => {
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 200));
         this.roof = {
           ...this.roof,
           state: 'STOPPED',
           motorCurrentMa: 0,
           lastUpdate: new Date().toISOString(),
         };
-        this.notify();
-        return true;
-      }
-    });
-  }
-
-  /**
-   * Solar Tracker: Nudge or set angles
-   */
-  public async adjustTracker(hDelta: number, vDelta: number) {
-    return commandService.executeCommand({
-      targetNode: 'N04',
-      action: 'TRACKER_ADJUST',
-      payload: { hDelta, vDelta },
-      executor: async () => {
-        await new Promise(r => setTimeout(r, 400));
-        const newH = Math.min(180, Math.max(0, this.tracker.horizontalAngle + hDelta));
-        const newV = Math.min(90, Math.max(0, this.tracker.verticalAngle + vDelta));
-        this.tracker = {
-          ...this.tracker,
-          horizontalAngle: newH,
-          verticalAngle: newV,
-          mode: 'MANUAL',
-          lastUpdate: new Date().toISOString(),
-        };
-        this.notify();
-        return true;
-      }
-    });
-  }
-
-  public async centerTracker() {
-    return commandService.executeCommand({
-      targetNode: 'N04',
-      action: 'TRACKER_CENTER',
-      executor: async () => {
-        await new Promise(r => setTimeout(r, 500));
-        this.tracker = {
-          ...this.tracker,
-          horizontalAngle: 90,
-          verticalAngle: 45,
-          mode: 'AUTO',
-          lastUpdate: new Date().toISOString(),
-        };
+        this.addEvent({
+          eventType: 'ROOF_STOPPED',
+          nodeId: 'N04',
+          severity: 'warning',
+          description: 'Emergency stop issued to N04 roof motor driver.',
+        });
         this.notify();
         return true;
       }

@@ -11,7 +11,7 @@ export type NodeId =
   | 'N01' // Server ESP32-WROOM-32UE
   | 'N02' // Agriculture + Crop Manager ESP32-WROOM-32UE
   | 'N03' // Power ESP32-WROOM-32UE
-  | 'N04' // Roof / Tracker / Perimeter ESP32-WROOM-32UE
+  | 'N04' // Roof & Perimeter ESP32-WROOM-32UE
   | 'N05' // TFT HMI ESP32-WROOM-32UE
   | 'N06' // Security Camera ESP32-AI Thinker CAM
   | 'N07' // Crop Camera ESP32-AI Thinker CAM
@@ -99,7 +99,7 @@ export interface SecurityTelemetry {
   lastUpdate: string;
 }
 
-export type RoofState = 'OPEN' | 'CLOSED' | 'OPENING' | 'CLOSING' | 'STOPPED' | 'FAULT';
+export type RoofState = 'CLOSED' | 'OPEN' | 'OPENING' | 'CLOSING' | 'STOPPED' | 'FAULT' | 'OFFLINE';
 
 export interface RoofTelemetry {
   state: RoofState;
@@ -110,19 +110,7 @@ export interface RoofTelemetry {
   motorCurrentMa?: number;
   lastCommandTimestamp?: string;
   lastUpdate: string;
-}
-
-export interface TrackerTelemetry {
-  horizontalAngle: number; // degrees 0-180
-  verticalAngle: number; // degrees 0-90
-  mode: 'AUTO' | 'MANUAL' | 'CALIBRATING' | 'PARKED';
-  ldrSensors: {
-    topLeft: number;
-    topRight: number;
-    bottomLeft: number;
-    bottomRight: number;
-  };
-  lastUpdate: string;
+  faultReason?: string;
 }
 
 export interface CameraTelemetry {
@@ -218,6 +206,7 @@ export interface FarmEvent {
     | 'RAIN_DETECTED'
     | 'ROOF_CLOSED'
     | 'ROOF_OPENED'
+    | 'ROOF_STOPPED'
     | 'MOTION_DETECTED'
     | 'PERIMETER_ZONE_TRIGGERED'
     | 'PUMP_ON'
